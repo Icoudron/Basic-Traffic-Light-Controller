@@ -3,7 +3,7 @@ In this Project I will be working on creating a basic traffic light and progress
 
 Throughout this project I plan to continue adding too this project, starting with the basics and working my way up to a full functioning intersection by adding the following:
 
-- Pedestrian Crossing Timer
+- Pedestrian Crossing Timer ✅
 - Emergency Service Setting
 - Traffic Light Intersection
 - Add Left Turn Signals
