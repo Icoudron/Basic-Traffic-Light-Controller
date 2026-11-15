@@ -104,6 +104,7 @@ Added a flashing zero indicator during the Yellow and Red traffic light states. 
 
 To transition this project from relying solely on the Basys 3's onboard LEDs to a physical prototype, a custom Printed Circuit Board (PCB) was designed using KiCad. 
 Eventually, the led outputs will transfer to using the PMOD GPIO pins built into the Basys 3
+![PCB Design layout](/Screenshots/PCB_Screenshot.png)
 
 #### PCB Features:
 * **Custom LED Array:** Houses the required Red, Yellow, and Green LEDs to simulate the thru traffic light outputs, a secondary PCB houses the LEDS (Red, Yellow, Green, and Flashing Yellow LEDS simulate left turn traffic light outputs.
@@ -111,9 +112,15 @@ Eventually, the led outputs will transfer to using the PMOD GPIO pins built into
 * **FPGA Interface:** Utilizes a JST connector header (J1 & J2) to cleanly wire the board directly to the Basys 3 PMOD expansion ports.
 * **Physical Integration:** Designed with specific dimensions and routing clearances to slot seamlessly into the custom 3D-modeled housings.
 
+![PCB Front Side](/Screenshots/PCB_Model_Front.png)
+![PCB Back Side](Screenshots/PCB_Model_Back.png)
+
+
 ### CADD Model
 
 A complete 3D mechanical model of the traffic light intersection was designed to house the electronics and bring the project to life. 
+
+![3d CADD Model of Stoplight](Screenshots/CADD_Screenshot.png)
 
 #### Model Features:
 * **Mast Arm Assembly:** Features a realistic main vertical pole, a curved upper mast arm, and a lower horizontal support structure.
