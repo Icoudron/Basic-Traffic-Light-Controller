@@ -30,6 +30,8 @@ Implemented a Finite State Machine (FSM) that cycles through three traffic light
 | Yellow | LED 1      | 3 seconds |
 | Red | LED 2      | 10 seconds |
 
+- Duration can be easily changed by adjusting the value within [traffic_light.v](/traffic_light.v) at lines 59, 60, and 61.
+
 The controller continuously follows the sequence:
 
 GREEN → YELLOW → RED → GREEN
@@ -113,7 +115,7 @@ Eventually, the led outputs will transfer to using the PMOD GPIO pins built into
 * **Physical Integration:** Designed with specific dimensions and routing clearances to slot seamlessly into the custom 3D-modeled housings.
 
 ![PCB Front Side](/Screenshots/PCB_Model_Front.png)
-![PCB Back Side](Screenshots/PCB_Model_Back.png)
+![PCB Back Side](/Screenshots/PCB_Model_Back.png)
 
 
 ### CADD Model
