@@ -18,9 +18,9 @@
 // 
 // Hrdware Used:
 // - 100MHz onboard clock
-// - Green LED (LED 0) that runs for 8 seconds
-// - Yellow LED (LED 1) that runs for 2 seconds
-// - RED LED (LED 2) that runs for 5 seconds
+// - Green LED (LED 0) that runs for 20 seconds
+// - Yellow LED (LED 1) that runs for 3 seconds
+// - RED LED (LED 2) that runs for 10 seconds
 // - Reset button (btnC) thats resets the controller back to Green
 // 
 // Revision 0.01 - File Created
