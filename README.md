@@ -99,3 +99,25 @@ Added a flashing zero indicator during the Yellow and Red traffic light states. 
 - A separate blink signal controls the flashing.
 
 - The blink signal toggles once per second.
+
+### PCB Design
+
+To transition this project from relying solely on the Basys 3's onboard LEDs to a physical prototype, a custom Printed Circuit Board (PCB) was designed using KiCad. 
+Eventually, the led outputs will transfer to using the PMOD GPIO pins built into the Basys 3
+
+#### PCB Features:
+* **Custom LED Array:** Houses the required Red, Yellow, and Green LEDs to simulate the thru traffic light outputs, a secondary PCB houses the LEDS (Red, Yellow, Green, and Flashing Yellow LEDS simulate left turn traffic light outputs.
+* **Current Limiting:** Includes onboard resistors (e.g., 100-ohm) to safely drive the LEDs directly from the FPGA's 3.3V logic.
+* **FPGA Interface:** Utilizes a JST connector header (J1 & J2) to cleanly wire the board directly to the Basys 3 PMOD expansion ports.
+* **Physical Integration:** Designed with specific dimensions and routing clearances to slot seamlessly into the custom 3D-modeled housings.
+
+### CADD Model
+
+A complete 3D mechanical model of the traffic light intersection was designed to house the electronics and bring the project to life. 
+
+#### Model Features:
+* **Mast Arm Assembly:** Features a realistic main vertical pole, a curved upper mast arm, and a lower horizontal support structure.
+* **Modular Light Housings:** Includes two distinct, structurally integrated enclosures:
+  * **Straight Light:** A standard 3-light housing equipped with visors for the primary Green/Yellow/Red sequence.
+  * **Left Turn (LT) Light:** A 4-light housing designed to support the planned addition of dedicated left-turn signals.
+* **Hardware Integration:** The housings are dimensioned to securely mount the custom PCB, allowing for internal wire routing through the support arms and down the main pole to the Basys 3 board.
