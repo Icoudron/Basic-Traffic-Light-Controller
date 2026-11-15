@@ -15,3 +15,87 @@ Things I hope to add once I have learned and proficient in through college:
 - Soft Processor Interface
 - RISC-V Integration
 - Make an ASIC Style Design
+
+
+
+## Implemented Features
+
+### 1. Traffic Light Controller
+
+Implemented a Finite State Machine (FSM) that cycles through three traffic light states:
+
+| State | LED Output | Duration |
+|-------|------------|----------|
+| Green | LED 0      | 20 seconds |
+| Yellow | LED 1      | 3 seconds |
+| Red | LED 2      | 10 seconds |
+
+The controller continuously follows the sequence:
+
+GREEN → YELLOW → RED → GREEN
+
+A center pushbutton (btnC) resets the controller to the Green state.
+
+### 2. Clock Divider
+
+Implemented a clock divider that converts the Basys 3's 100 MHz system clock into a one-second timing pulse.
+
+- Counts 100,000,000 clock cycles.
+
+- Generates a one-clock-cycle tick signal every second.
+
+- Uses the timing pulse to control FSM transitions.
+
+- Provides timing for the flashing warning indicator.
+
+### 3. Pedestrian Timer
+
+#### Countdown Timer
+
+Added countdown functionality to calculate the remaining time in the current traffic light state.
+
+The countdown automatically updates once per second.
+
+#### Two-Digit Seven-Segment Display
+
+Expanded the original single-digit display to support two-digit countdown values.
+
+Implemented:
+
+- Tens and ones digit conversion.
+
+- Decimal division and modulus operations.
+
+- Seven-segment number decoding.
+
+- Display selection using the Basys 3 anode outputs.
+
+The countdown is separated into individual digits using:
+
+- Tens = Countdown / 10
+
+- Ones = Countdown % 10
+
+### 4. Seven-Segment Display Multiplexing
+
+Implemented display multiplexing to operate two seven-segment digits using shared segment outputs.
+
+A refresh counter rapidly alternates between the two active digits.
+
+- Uses refresh_counter to control display timing.
+
+- Uses digit_select to alternate between the tens and ones digits.
+
+- Uses display_value to select the number sent to the seven-segment decoder.
+
+- Uses AN1 and AN0 for the two-digit display.
+
+6. Flashing Warning Indicator
+
+Added a flashing zero indicator during the Yellow and Red traffic light states. (Acts as a wait sign for pedestrians)
+
+- The display alternates between showing zero and being blank.
+
+- A separate blink signal controls the flashing.
+
+- The blink signal toggles once per second.
