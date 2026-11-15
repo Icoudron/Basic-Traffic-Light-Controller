@@ -30,7 +30,7 @@ Implemented a Finite State Machine (FSM) that cycles through three traffic light
 | Yellow | LED 1      | 3 seconds |
 | Red | LED 2      | 10 seconds |
 
-- Duration can be easily changed by adjusting the value within [traffic_light.v](/traffic_light.v) at lines 59, 60, and 61.
+- Duration can be easily changed by adjusting the value within [traffic_light.v](./traffic_light.v#L59-L61) at lines 59, 60, and 61.
 
 The controller continuously follows the sequence:
 
