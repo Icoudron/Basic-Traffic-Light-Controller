@@ -12,7 +12,7 @@
 // states using the 100 MHz clock. A clock divider generates a one-second
 // timing pulse used by FSM
 //
-// The reaming time is displayed on teh onboard seven-segment display.
+// The remaining time is displayed on the onboard seven-segment display.
 // During the Yellow and Red States, the display flashes 0 once per second
 // as a warning indication.
 // 
@@ -35,10 +35,11 @@ module traffic_light(
     
     input clk,      // 100 MHz System Clock
     input btnC,     // Reset Button
+    input [15:0] sw, // Emergency Service Switch
     
     // Outputs
     
-    output reg [2:0] led,    // Traffic Light LEDs
+    output reg [15:0] led,    // Traffic Light LEDs
     
     output reg [6:0] seg,   // Seven Segment Display
     output reg [3:0] an
@@ -75,6 +76,7 @@ module traffic_light(
     reg [3:0] tens;             // Tens digit
     reg [3:0] ones;             // Ones digit
     reg [3:0] display_value;        // Current digit sent to decoder
+    reg emergency_previous = 0;     // Emergency switch detection
     
    
     
@@ -88,7 +90,13 @@ module traffic_light(
  
     always @(posedge clk)
     begin
-        if(divider == 100000000-1)
+        if(btnC)
+    begin
+        divider <= 0;
+        tick <= 0;
+        blink <= 0;
+    end
+        else if(divider == 100000000-1)
         begin   
             divider <= 0;
             tick <= 1;              // Generate one-clock-cycle timing pulse
@@ -101,6 +109,16 @@ module traffic_light(
         end
     end
     
+    
+    
+    always @(posedge clk)
+    begin
+        if(btnC)
+            emergency_previous <= 0;
+        else
+            emergency_previous <= sw[15];
+    end
+    
     // Display Refresh Counter
     //
     // Rapidly alternates between the two seven segment digits occuring fast enough
@@ -108,14 +126,21 @@ module traffic_light(
     
     always @(posedge clk)
     begin
-        refresh_counter <= refresh_counter +1;
-        
-        if(refresh_counter == 50000)
+        if(btnC)
         begin
             refresh_counter <= 0;
-            digit_select <= ~digit_select;
+            digit_select <= 0;
         end
-        
+        else
+        begin
+            refresh_counter <= refresh_counter +1;
+            
+            if(refresh_counter == 50000)
+            begin
+                refresh_counter <= 0;
+                digit_select <= ~digit_select;
+            end
+        end
     end
     
     // Digit Multiplexer
@@ -149,6 +174,19 @@ module traffic_light(
         seconds <= 0;
        
     end
+    
+    else if(sw[15])
+    begin
+        // Emergency Service Mode 
+        state <= state;     // Pauses normal traffic ligh sequence
+        seconds <= seconds;
+    end
+    else if(emergency_previous)
+    begin
+        state <= GREEN;
+        seconds <= 0;
+    end
+    
      // Advance only once per second
     else if (tick)    
     begin
@@ -162,7 +200,7 @@ module traffic_light(
             GREEN:
             begin
             
-                // Stay Green for 8 seconds
+                // Stay Green for 20 seconds
                 if(seconds == GREEN_TIME - 1)
                 begin
                     state <= YELLOW;
@@ -175,7 +213,7 @@ module traffic_light(
             YELLOW:
             begin 
             
-                // Stay Yellow for 2 seconds
+                // Stay Yellow for 3 seconds
                 if(seconds == YELLOW_TIME - 1)
                 begin
                     state <= RED;
@@ -188,7 +226,7 @@ module traffic_light(
             RED:
             begin 
             
-                // Stay red for 5 Seconds
+                // Stay red for 10 Seconds
                 if(seconds == RED_TIME - 1)
                 begin
                     state <= GREEN;
@@ -254,13 +292,22 @@ end
     
     always @(*)
     begin
-    
+        
+        if (sw[15])
+        begin
+            // Emergency mode: Flash zero
+            
+            if (blink)
+                seg = 7'b1000000;       // Show 0
+            else
+                seg = 7'b1111111;       // Blank display 
+        end
         // Flash zero during RED or YELLOW
-        if((state == RED) || (state == YELLOW))
+        else if ((state == RED) || (state == YELLOW))
         begin
         
-            if(blink)
-                seg = 7'b1000000;       // Show 0
+            if (blink)
+                seg = 7'b1000000;       // display 0
             else
                 seg = 7'b1111111;       // Blank display
                 
@@ -303,15 +350,30 @@ end
         // LED2 = RED         
                 
     always @(*) begin
+        if (sw[15])
+        begin
+            // Emergency mode: flash the red LED (LED 2)
+            // LED 15 stays on (Emergency indicator)
+            
+            if (blink)
+                led = 16'b1000000000000100;
+            else
+                led = 16'b1000000000000000;
+        end
+        else
+        
+        begin
         case(state)
+            // Normal Traffic operation
     
-            GREEN:  led = 3'b001;
+            GREEN:  led = 16'b0000000000000001;
         
-            YELLOW: led = 3'b010;
+            YELLOW: led = 16'b0000000000000010;
         
-            RED:    led = 3'b100;
+            RED:    led = 16'b0000000000000100;
         
-            default: led = 3'b000;
+            default: led = 16'b0000000000000000;
         endcase  
     end
+end
 endmodule
