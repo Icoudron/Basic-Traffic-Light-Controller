@@ -4,7 +4,7 @@ In this Project I will be working on creating a basic traffic light and progress
 Throughout this project I plan to continue adding too this project, starting with the basics and working my way up to a full functioning intersection by adding the following:
 
 - Pedestrian Crossing Timer ✅
-- Emergency Service Setting
+- Emergency Service Setting ✅
 - Traffic Light Intersection
 - Add Left Turn Signals
 - UART Debugging
@@ -30,7 +30,7 @@ Implemented a Finite State Machine (FSM) that cycles through three traffic light
 | Yellow | LED 1      | 3 seconds |
 | Red | LED 2      | 10 seconds |
 
-- Duration can be easily changed by adjusting the value within [traffic_light.v](./traffic_light.v#L59-L61) at lines 59, 60, and 61.
+- Duration can be easily changed by adjusting the value within [traffic_light.v](./traffic_light.v#L60-L62) at lines 60, 61, and 62.
 
 The controller continuously follows the sequence:
 
@@ -92,7 +92,7 @@ A refresh counter rapidly alternates between the two active digits.
 
 - Uses AN1 and AN0 for the two-digit display.
 
-6. Flashing Warning Indicator
+### 5. Flashing Warning Indicator
 
 Added a flashing zero indicator during the Yellow and Red traffic light states. (Acts as a wait sign for pedestrians)
 
@@ -102,7 +102,7 @@ Added a flashing zero indicator during the Yellow and Red traffic light states. 
 
 - The blink signal toggles once per second.
 
-### PCB Design
+### 7. PCB Design
 
 To transition this project from relying solely on the Basys 3's onboard LEDs to a physical prototype, a custom Printed Circuit Board (PCB) was designed using KiCad. 
 Eventually, the led outputs will transfer to using the PMOD GPIO pins built into the Basys 3
@@ -118,7 +118,7 @@ Eventually, the led outputs will transfer to using the PMOD GPIO pins built into
 ![PCB Back Side](/Screenshots/PCB_Model_Back.png)
 
 
-### CADD Model
+### 8. CADD Model
 
 A complete 3D mechanical model of the traffic light intersection was designed to house the electronics and bring the project to life. 
 
@@ -130,3 +130,37 @@ A complete 3D mechanical model of the traffic light intersection was designed to
   * **Straight Light:** A standard 3-light housing equipped with visors for the primary Green/Yellow/Red sequence.
   * **Left Turn (LT) Light:** A 4-light housing designed to support the planned addition of dedicated left-turn signals.
 * **Hardware Integration:** The housings are dimensioned to securely mount the custom PCB, allowing for internal wire routing through the support arms and down the main pole to the Basys 3 board.
+
+### 9. Emergency Service Mode
+
+Added an emergency service mode controlled by switch sw[15] on the Basys 3 FPGA board. This feature allows the normal traffic-light sequence to be temporarily interrupted when emergency services are present.
+
+#### Emergency Switch Functionality
+
+When the emergency switch is activated:
+
+- Pauses the normal traffic-light FSM.
+
+- Freezes the current countdown timer.
+
+- Activates LED 15 as an emergency mode indicator.
+
+- Flashes the Red traffic light LED (LED 2) once per second.
+
+- Changes the seven-segment display to flash zero and blank alternately as a warning indicator.
+
+#### Automatic Reset After Emergency Mode
+
+Added emergency switch transition detection using an emergency_previous register to identify when the switch changes from ON to OFF.
+
+- Detects when emergency mode is deactivated.
+
+- Automatically resets the traffic-light controller to Green.
+
+- Resets the elapsed time counter to zero.
+
+- Restarts the Green countdown at its full 20-second duration.
+
+This ensures that the traffic-light sequence restarts in a predictable state after emergency services have passed, rather than resuming an interrupted sequence.
+
+
