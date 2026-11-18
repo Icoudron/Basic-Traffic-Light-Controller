@@ -18,9 +18,9 @@
 // 
 // Hrdware Used:
 // - 100MHz onboard clock
-// - Green LED (LED 0) that runs for 20 seconds
+// - Green LED (LED 2) that runs for 20 seconds
 // - Yellow LED (LED 1) that runs for 3 seconds
-// - RED LED (LED 2) that runs for 10 seconds
+// - RED LED (LED 0) that runs for 10 seconds
 // - Reset button (btnC) thats resets the controller back to Green
 // 
 // Revision 0.01 - File Created
@@ -35,14 +35,17 @@ module traffic_light(
     
     input clk,      // 100 MHz System Clock
     input btnC,     // Reset Button
-    input [15:0] sw, // Emergency Service Switch
+    input [2:0] sw, // SW0 = Flash Red, SW1 = Flash Yellow, SW2 = Green Extension
     
     // Outputs
     
-    output reg [15:0] led,    // Traffic Light LEDs
+    output reg [15:0] led,    // LEDS Cooresponds to active traffic light or active switch
+    
     
     output reg [6:0] seg,   // Seven Segment Display
-    output reg [3:0] an
+    output reg [3:0] an,
+    output reg [2:0] JB
+    
   
     );
     
@@ -76,7 +79,10 @@ module traffic_light(
     reg [3:0] tens;             // Tens digit
     reg [3:0] ones;             // Ones digit
     reg [3:0] display_value;        // Current digit sent to decoder
-    reg emergency_previous = 0;     // Emergency switch detection
+    reg flashing_previous = 0;  // Remembers if a flashing mode was previously active
+    
+    
+
     
    
     
@@ -107,16 +113,6 @@ module traffic_light(
             divider <= divider + 1;     // Continue counting towards one second
             tick <= 0;
         end
-    end
-    
-    
-    
-    always @(posedge clk)
-    begin
-        if(btnC)
-            emergency_previous <= 0;
-        else
-            emergency_previous <= sw[15];
     end
     
     // Display Refresh Counter
@@ -170,25 +166,29 @@ module traffic_light(
     
         // Reset button returns the controller to Green
         if(btnC)
-        begin   state <= GREEN;
-        seconds <= 0;
-       
-    end
+        begin   
+            state <= GREEN;
+            seconds <= 0;
+            flashing_previous <= 0;
+        end
+        
+        // Remember when either flashing switch is active
+        else if (sw[0] || sw[1])
+        begin
+            flashing_previous <= 1;
+        end
+        
+        // Return top Green when both flashing switches are turned off
+        else if (flashing_previous)
+        begin
+            state <= GREEN;
+            seconds <= 0;
+            flashing_previous <= 0;
+        end
     
-    else if(sw[15])
-    begin
-        // Emergency Service Mode 
-        state <= state;     // Pauses normal traffic ligh sequence
-        seconds <= seconds;
-    end
-    else if(emergency_previous)
-    begin
-        state <= GREEN;
-        seconds <= 0;
-    end
     
      // Advance only once per second
-    else if (tick)    
+    else if (tick && !(sw[2] && state == GREEN))    
     begin
     
         seconds <= seconds + 1;
@@ -293,9 +293,9 @@ end
     always @(*)
     begin
         
-        if (sw[15])
+        if (sw[0] || sw[1])
         begin
-            // Emergency mode: Flash zero
+           // Manual flashing mode: Flash zero
             
             if (blink)
                 seg = 7'b1000000;       // Show 0
@@ -345,34 +345,72 @@ end
     
         // Turns on the LED corresponding to the state
         
-        // LED0 = Green
+        // External LEDS
+        // JB1 = Green
+        // JB2 = Yellow
+        // JB3 = RED     
+        
+        // Onboard LEDS
+        // LED0 = RED
         // LED1 = Yellow
-        // LED2 = RED         
+        // LED2 = Green        
                 
     always @(*) begin
-        if (sw[15])
+        // Defaults all Values to OFF
+        led = 16'b0000000000000000;
+        JB = 3'b000;
+        
+        if (sw[0])
         begin
-            // Emergency mode: flash the red LED (LED 2)
-            // LED 15 stays on (Emergency indicator)
-            
+           // Manual flashing mode: Flash zero on the display
+           // SW0: Flash the red LED
+           
             if (blink)
-                led = 16'b1000000000000100;
-            else
-                led = 16'b1000000000000000;
+            begin
+                led[0] = 1'b1;
+                JB[2] = 1'b1;
+            end
         end
+        
+        else if (sw[1])
+        begin
+            // Flash Yellow
+            if(blink)
+            begin
+                led[1] = 1'b1;
+                JB[1] = 1'b1;
+            end
+        end
+        
         else
         
         begin
         case(state)
             // Normal Traffic operation
     
-            GREEN:  led = 16'b0000000000000001;
+            GREEN:
+            begin
+                led[2] = 1'b1;
+                JB[0] = 1'b1;
+            end
         
-            YELLOW: led = 16'b0000000000000010;
+            YELLOW:
+            begin
+                led[1] = 1'b1;
+                JB[1] = 1'b1;
+            end
         
-            RED:    led = 16'b0000000000000100;
+            RED:
+            begin
+                led[0] = 1'b1;
+                JB[2] = 1'b1;
+            end
         
-            default: led = 16'b0000000000000000;
+            default:
+            begin
+                led = 16'b0;
+                JB = 3'b000;
+            end
         endcase  
     end
 end
