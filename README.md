@@ -40,6 +40,8 @@ The controller continuously follows the sequence:
 
 A center pushbutton (`btnC`) resets the controller to the Green state.
 
+![Image of FPGA Board](/Screenshots/FPGA_Board.jpg).
+
 ### 2. Clock Divider
 
 Implemented a clock divider that converts the Basys 3's 100 MHz system clock into a one-second timing pulse.
